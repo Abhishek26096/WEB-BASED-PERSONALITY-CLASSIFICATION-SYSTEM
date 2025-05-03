@@ -73,15 +73,17 @@
       padding: 10px;
     }
 
-    .feedback-form {
+    .google-form-link {
       margin-top: 60px;
-      background: linear-gradient(135deg, #f1f8e9, #e3f2fd);
-      padding: 35px 30px;
+      background: #ffffff;
+      padding: 40px 30px;
       border-radius: 20px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
       animation: slideFade 1.2s ease forwards;
       transform: translateY(50px);
       opacity: 0;
+      text-align: center;
+      border: 2px solid #6a11cb;
     }
 
     @keyframes slideFade {
@@ -91,46 +93,35 @@
       }
     }
 
-    .feedback-form h3 {
-      margin-bottom: 20px;
+    .google-form-link h3 {
+      margin-bottom: 25px;
       color: #6a11cb;
       font-weight: 700;
-      font-size: 24px;
-      text-align: center;
+      font-size: 26px;
+      text-transform: uppercase;
     }
 
-    .feedback-form textarea {
-      width: 100%;
-      height: 120px;
-      padding: 15px;
-      border: none;
-      border-radius: 15px;
+    .google-form-link p {
+      color: #555;
       font-size: 16px;
-      font-family: 'Poppins', sans-serif;
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
-      transition: box-shadow 0.3s ease;
+      margin-bottom: 20px;
     }
 
-    .feedback-form textarea:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
-    }
-
-    .feedback-form button {
-      display: block;
-      margin: 20px auto 0;
+    .google-form-link a {
+      display: inline-block;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white;
       padding: 12px 28px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
-      border: none;
+      text-align: center;
       border-radius: 30px;
-      cursor: pointer;
+      text-decoration: none;
       transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .feedback-form button:hover {
+    .google-form-link a:hover {
       transform: scale(1.05);
       background: linear-gradient(135deg, #2575fc, #6a11cb);
     }
@@ -142,8 +133,8 @@
       .result-container {
         padding: 30px 20px;
       }
-      .feedback-form {
-        padding: 25px 20px;
+      .google-form-link {
+        padding: 30px 20px;
       }
     }
   </style>
@@ -155,14 +146,12 @@
     <div class="chart-container">
       <canvas id="myChart"></canvas>
     </div>
+  </div>
 
-    <div class="feedback-form">
-      <h3>💬 We'd love your feedback!</h3>
-      <form onsubmit="handleFeedback(event)">
-        <textarea placeholder="🌟 Share your experience..." required></textarea>
-        <button type="submit">🚀 Submit Feedback</button>
-      </form>
-    </div>
+  <div class="google-form-link">
+    <h3>💬 We'd love your feedback!</h3>
+    <p>Please share your thoughts with us so we can improve your experience.</p>
+    <a href="https://forms.gle/YFBJMHgALFoDtMEy8" target="_blank">Click here to provide your feedback</a>
   </div>
 
   <script>
@@ -228,16 +217,6 @@
         }
       }
     });
-
-    function handleFeedback(event) {
-      event.preventDefault();
-      const textarea = event.target.querySelector('textarea');
-      const feedback = textarea.value.trim();
-      if (feedback) {
-        alert('🎉 Thank you for your feedback!');
-        textarea.value = '';
-      }
-    }
   </script>
 </body>
 </html>
