@@ -1,3 +1,4 @@
+import os
 import pymysql
 pymysql.install_as_MySQLdb()
 
@@ -8,14 +9,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, PersonalityResponse
 import json
 import pandas as pd
-from Test import  generate_chart
+from Test import generate_chart
 
 # Flask application setup
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a strong secret key
 
+# Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Abhishek%406206974833@localhost/personality_db'
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database
@@ -31,7 +32,7 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# ✅ Correct decorator to create tables
+# Create tables before the first request
 @app.before_first_request
 def create_tables():
     db.create_all()
@@ -69,43 +70,23 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    import pandas as pd
-    questions = pd.read_csv('questions.csv').to_dict('records')  # Ensure this file exists
+    questions = pd.read_csv('questions.csv').to_dict('records')  # Make sure this file exists
     return render_template('index.html', questions=questions)
 
 # Submit route
 @app.route('/submit', methods=['POST'])
 @login_required
 def submit():
-    user_responses = {}
-    for key, value in request.form.items():
-        user_responses[key] = value
+    user_responses = {key: value for key, value in request.form.items()}
+    user_responses_df = pd.DataFrame(user_responses, index=[0]).astype(int)
 
+    personality_type, my_sums = generate_chart(user_responses_df)
 
-    # Write user responses to dataframe
-    user_responses_df = pd.DataFrame(user_responses, index=[0])
-    user_responses_df = user_responses_df.astype(int)
-     
-    ## Generate the chart, get the personality type and the personality traits value(my_sums)
-    personality_type,my_sums=generate_chart(user_responses_df)
+    return render_template('results.html',
+                           personality_type=personality_type,
+                           labels=list(my_sums.columns[0:5]),
+                           data=list(my_sums.values[0][0:5]))
 
-    # Render the results.html template and pass the personality type and the personality traits value
-    return render_template('results.html',personality_type=personality_type,
-                             labels=list(my_sums.columns[0:5]),data=list(my_sums.values[0][0:5]))
-'''def submit():
-    answers = {k: v for k, v in request.form.items()}
-    
-    # Dummy ML model response
-    personality_type = "Introvert"  # Replace with your model's prediction
-    result = PersonalityResponse(user_id=current_user.id, answers=json.dumps(answers), result=personality_type)
-    db.session.add(result)
-    db.session.commit()
-    
-    # Prepare data for chart
-    labels = list(answers.keys())
-    data = [int(val) for val in answers.values()]
-    return render_template('results.html', personality_type=personality_type, labels=labels, data=data)
-'''
 # Admin route
 @app.route('/admin')
 @login_required
@@ -122,5 +103,10 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+# ✅ Main app runner block (updated for deployment)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', 5000)),
+        debug=True
+    )
